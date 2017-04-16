@@ -3,11 +3,10 @@ package com.rz.utils.file.iterators;
 import com.rz.utils.file.iterators.storables.ProcessedInputResponse;
 import com.rz.utils.file.iterators.storables.StorableEngine;
 import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.Closeable;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,5 +39,22 @@ public abstract class FileToStoragesIterator implements Closeable {
 
     public void close() throws IOException {
         storableEngine.close();
+    }
+
+    public static void main(String[] args) throws IOException {
+        Reader in = new FileReader("C:\\\\inputFiles\\\\try.csv");
+        Iterable<CSVRecord> records = CSVFormat.MYSQL.parse(in);
+
+        System.out.println(records.iterator().next().get(0));
+        in.close();
+//        CSVParser parser = new CSVParser(
+//                new FileReader("C:\\inputFiles\\try.csv"),
+//                CSVFormat.MYSQL.withHeader());
+//        for (CSVRecord record : parser) {
+//            System.out.printf("%st%sn",
+//                    record.get("COL1"),
+//                    record.get("COL2"));
+//        }
+//        parser.close();
     }
 }
