@@ -1,5 +1,6 @@
 package com.rz.utils.file.iterators;
 
+import com.google.common.reflect.TypeToken;
 import com.rz.utils.file.iterators.storables.ProcessedInputResponse;
 import com.rz.utils.file.iterators.storables.StorableEngine;
 import org.apache.commons.csv.CSVFormat;
@@ -7,41 +8,54 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
 import java.io.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by Roee Zilkha on 4/16/2017.
  */
-public abstract class FileToStoragesIterator implements Closeable {
+public  class FileToStoragesIterator<T extends FileIterator> implements Closeable {
     private StorableEngine storableEngine;
-    private String filePath;
+    private T fileIterator;
 
-    public FileToStoragesIterator(StorableEngine storableEngine, String filePath) {
-        this.storableEngine = storableEngine;
-        this.filePath = filePath;
+    public FileToStoragesIterator( Class<T> clazz,String path) throws Exception  {
+        this.storableEngine = null;
+        Constructor<T> fileIteratorCtor = clazz.getConstructor(String.class);
+        try {
+            fileIterator = fileIteratorCtor.newInstance(path);
+        } catch (InvocationTargetException e) {
+            throw new Exception(e.getCause());
+        }
 
 
-//        CSVFormat.EXCEL.parse(new BufferedReader(new BufferedInputStream("dasda")));
+        this.fileIterator = fileIterator;
     }
 
     public StorableEngine getStorableEngine() {
         return storableEngine;
     }
 
-    public String getFilePath() {
-        return filePath;
-    }
+
 
     public ProcessedInputResponse next(){
         return null;
     }
 
+    public boolean hasNext(){
+        return fileIterator.hasNext();
+    }
+
     public void close() throws IOException {
+        fileIterator.close();
         storableEngine.close();
     }
 
-    public static void main(String[] args) throws IOException {
+        public static void main(String[] args) throws Exception {
+
+        FileToStoragesIterator<CsvFileIterator> fileIteratorFileToStoragesIterator = new FileToStoragesIterator<CsvFileIterator>(CsvFileIterator.class,"C:\\inputFiles\\try.csv");
+
         Reader in = new FileReader("C:\\\\inputFiles\\\\try.csv");
         Iterable<CSVRecord> records = CSVFormat.MYSQL.parse(in);
 
