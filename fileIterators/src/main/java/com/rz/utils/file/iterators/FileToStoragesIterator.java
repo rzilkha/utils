@@ -20,7 +20,7 @@ public  class FileToStoragesIterator<T extends FileIterator> implements Closeabl
     private StorableEngine storableEngine;
     private T fileIterator;
 
-    public FileToStoragesIterator( Class<T> clazz,String path) throws Exception  {
+    public FileToStoragesIterator( StorableEngine storableEngine,Class<T> clazz,String path) throws Exception  {
         this.storableEngine = null;
         Constructor<T> fileIteratorCtor = clazz.getConstructor(String.class);
         try {
@@ -28,8 +28,6 @@ public  class FileToStoragesIterator<T extends FileIterator> implements Closeabl
         } catch (InvocationTargetException e) {
             throw new Exception(e.getCause());
         }
-
-
         this.fileIterator = fileIterator;
     }
 
@@ -37,10 +35,9 @@ public  class FileToStoragesIterator<T extends FileIterator> implements Closeabl
         return storableEngine;
     }
 
-
-
     public ProcessedInputResponse next(){
-        return null;
+        FileRecord nextRecord = fileIterator.next();
+        return storableEngine.processInputLine(nextRecord);
     }
 
     public boolean hasNext(){
@@ -54,7 +51,7 @@ public  class FileToStoragesIterator<T extends FileIterator> implements Closeabl
 
         public static void main(String[] args) throws Exception {
 
-        FileToStoragesIterator<CsvFileIterator> fileIteratorFileToStoragesIterator = new FileToStoragesIterator<CsvFileIterator>(CsvFileIterator.class,"C:\\inputFiles\\try.csv");
+        FileToStoragesIterator<CsvFileIterator> fileIteratorFileToStoragesIterator = new FileToStoragesIterator<CsvFileIterator>(null,CsvFileIterator.class,"C:\\inputFiles\\try.csv");
 
         Reader in = new FileReader("C:\\\\inputFiles\\\\try.csv");
         Iterable<CSVRecord> records = CSVFormat.MYSQL.parse(in);

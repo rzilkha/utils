@@ -14,7 +14,7 @@ public interface StorableEngine extends Closeable {
     @Override
     void close() throws IOException;
 
-    void processInputLine(FileRecord fileRecord);
+    ProcessedInputResponse processInputLine(FileRecord fileRecord);
 
     void rollback(ProcessedInputResponse failedCommitResponse);
 }
