@@ -1,0 +1,8 @@
+{
+  "column1":{
+    "json_element_definition":{"first":{"second":{"json_element_value":{
+      "structureType":"Array",
+      "delimiter":","
+    }}}}
+  }
+}
