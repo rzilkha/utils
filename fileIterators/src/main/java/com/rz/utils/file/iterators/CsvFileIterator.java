@@ -1,5 +1,8 @@
 package com.rz.utils.file.iterators;
 
+import com.rz.utils.file.iterators.jsonUtils.ColumnMapping;
+import com.rz.utils.file.iterators.jsonUtils.CsvParsedColumn;
+import com.rz.utils.file.iterators.jsonUtils.CsvValueParser;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -7,15 +10,20 @@ import org.apache.commons.csv.CSVRecord;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by Roee Zilkha on 4/16/2017.
  */
-public class CsvFileIterator<T> implements Iterator<T> {
+public class CsvFileIterator implements Iterator<List<CsvParsedColumn>> {
 
     private final Iterator<CSVRecord> csvIterator;
     private CSVParser parser;
-    private RowDataConvertor<T> rowDataConvertor;
+
+    private Map<String,CsvValueParser> csvHeaderValuesParsers;
+    private List<String> headers;
     public CsvFileIterator(String path) throws IOException {
 
         parser = new CSVParser(
@@ -26,18 +34,20 @@ public class CsvFileIterator<T> implements Iterator<T> {
     }
 
     @Override
-    public T next() {
+    public List<CsvParsedColumn> next() {
         CSVRecord record = csvIterator.next();
-
-        return  new CsvRecordItem(record);
+        return headers.stream().map(header -> {
+            CsvValueParser csvValueParser = csvHeaderValuesParsers.get(header);
+            String columnValue = record.get(header);
+            return csvValueParser.parsedValues(columnValue);
+        }).collect(Collectors.toList());
     }
 
     @Override
-    boolean hasNext() {
+    public boolean hasNext() {
         return csvIterator.hasNext();
     }
 
-    @Override
     public void close(){
         try {
             parser.close();
