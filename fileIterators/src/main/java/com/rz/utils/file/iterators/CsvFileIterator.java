@@ -11,12 +11,13 @@ import java.util.Iterator;
 /**
  * Created by Roee Zilkha on 4/16/2017.
  */
-public class CsvFileIterator extends FileIterator {
+public class CsvFileIterator<T> implements Iterator<T> {
 
     private final Iterator<CSVRecord> csvIterator;
     private CSVParser parser;
+    private RowDataConvertor<T> rowDataConvertor;
     public CsvFileIterator(String path) throws IOException {
-        super(path);
+
         parser = new CSVParser(
                 new FileReader(path),
                 CSVFormat.MYSQL.withHeader());
@@ -25,8 +26,9 @@ public class CsvFileIterator extends FileIterator {
     }
 
     @Override
-    FileRecord next() {
+    public T next() {
         CSVRecord record = csvIterator.next();
+
         return  new CsvRecordItem(record);
     }
 

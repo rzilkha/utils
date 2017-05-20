@@ -13,8 +13,9 @@ public class CheckIt {
         Arrays.asList(1).stream().forEach(num -> System.out.println(num));
 
         KafkaProducerTry kafkaProducerTry = new KafkaProducerTry();
-        kafkaProducerTry.sendWithCallback("hello");
-        Thread.sleep(100000);
+
+        kafkaProducerTry.syncSend("hello yuou sexy bitch");
+
 
     }
 }
